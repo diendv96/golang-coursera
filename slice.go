@@ -9,10 +9,9 @@ import (
 )
 
 func main() {
-	intList := make([]int, 3)
+	intList := make([]int, 0, 3)
 
 	var scanValue string
-	var index int = 0
 	for {
 		fmt.Print("Enter an integer", ": ")
 		_, err := fmt.Scan(&scanValue)
@@ -22,16 +21,13 @@ func main() {
 			os.Exit(0)
 		}
 		if exitCode == "x" {
-			sort.Ints(intList)
-			fmt.Println(intList)
+			fmt.Println("Exiting...")
 			os.Exit(0)
 		}
+
 		parseIntScanValue, err := strconv.Atoi(scanValue)
-		if index < 3 {
-			intList[index] = parseIntScanValue
-			index++
-		} else {
-			intList = append(intList, parseIntScanValue)
-		}
+		intList = append(intList, parseIntScanValue)
+		sort.Ints(intList)
+		fmt.Println(intList)
 	}
 }
