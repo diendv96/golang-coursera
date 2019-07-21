@@ -24,6 +24,8 @@ func main() {
 	}
 	// Create a channel
 	c := make(chan []int)
+	m := make(chan []int)
+	resultChan := make(chan []int)
 
 	// Divide
 	numbersLen := len(numbers)
@@ -37,13 +39,14 @@ func main() {
 
 	sub1 := <- c
 	sub2 := <- c
+	go merge(sub1, sub2, m)
+
 	sub3 := <- c
 	sub4 := <- c
+	go merge(sub3, sub4, m)
 
-	mergeSub12 := merge(sub1, sub2)
-	mergeSub34 := merge(sub3, sub4)
-	mergeSub1234 := merge(mergeSub12, mergeSub34)
-	fmt.Println("Sort result: ", mergeSub1234)
+	go merge(<- m, <- m, resultChan)
+	fmt.Println("Sort result: ", <- resultChan)
 }
 
 func parseInts(s string) ([]int, error) {
@@ -61,14 +64,13 @@ func parseInts(s string) ([]int, error) {
 	return numbers, nil
 }
 
-func sortSubArray(slice []int, c chan []int) []int {
+func sortSubArray(slice []int, c chan []int) {
 	fmt.Println("Will sorting following subarray: ", slice)
 	sort.Ints(slice)
 	c <- slice
-	return slice
 }
 
-func merge(left, right []int) []int {
+func merge(left, right []int, m chan []int) {
 	//make an []int of size of length of left + length of right
 	result := make([]int, len(left)+len(right))
 
@@ -90,6 +92,5 @@ func merge(left, right []int) []int {
 			right = right[1:]
 		}
 	}
-
-	return result
+	m <- result
 }
